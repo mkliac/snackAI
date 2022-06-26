@@ -16,18 +16,26 @@ BLOCK_SIZE = 20
 SPEED = 15
 GRID_ROW = int(WINDOW_WIDTH/(2*BLOCK_SIZE))
 GRID_COL = int(WINDOW_HEIGHT/BLOCK_SIZE)
+WALL = False
 
-def validateMove(head_x,head_y,snackBody):
+def validateMove(snackBody):
+    head_x = snackBody[0].getX()
+    head_y = snackBody[0].getY()
+
     if(head_x < 0 or head_y < 0 or head_x >= GRID_COL or head_y >= GRID_ROW):
         return False
 
+    i = 0
     for block in snackBody:
+        i = i + 1
+        if i == 1:
+            continue # skip head
         if block.getX() == head_x and block.getY() == head_y:
             return False
 
     return True
 
-def move(dir,head_x,head_y):
+def move(dir,head_x,head_y,wall):
     rx = 0
     ry = 0
 
@@ -44,8 +52,10 @@ def move(dir,head_x,head_y):
         rx = head_x + 1
         ry = head_y
     
-    rx = rx % GRID_COL
-    ry = ry % GRID_ROW
+    if(wall == False):
+        rx = rx % GRID_COL
+        ry = ry % GRID_ROW
+
     return rx, ry
 
 def changeDir(dir,idir):
@@ -80,6 +90,13 @@ def generateFood():
 
     return block
 
+def eatFood(snackBody,foodBlock):
+    for block in snackBody:
+        if(block.getX() == foodBlock.getX() and block.getY() == foodBlock.getY()):
+            return True
+
+    return False
+
 def main():
     pg.init()
     SCREEN = pg.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
@@ -99,11 +116,6 @@ def main():
 
     fps = pg.time.Clock()
 
-    drawer.drawGrid(GRID_ROW,GRID_COL,WHITE)
-    drawer.drawFood(foodBlock)
-    drawer.drawSnack(snack.getPieces())
-    pg.display.update()
-
     while(gameOver == False):
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -111,18 +123,18 @@ def main():
             if event.type == pg.KEYDOWN:
                 dir = changeDir(dir,event.key)
         
-        head_x,head_y = move(dir,head_x,head_y)
- 
-        if(head_x == foodBlock.getX() and head_y == foodBlock.getY()): #eat food
+        head_x,head_y = move(dir,head_x,head_y,WALL)
+
+        snack.append(head_x,head_y)
+
+        if(eatFood(snack.getPieces(),foodBlock) == True): #eat food
             foodBlock = generateFood()
             score += 1
         else:
             snack.pop()
 
-        if(validateMove(head_x,head_y,snack.getPieces()) == False):
+        if(validateMove(snack.getPieces()) == False):
             gameOver = True
-        
-        snack.append(head_x,head_y)
 
         drawer.screenClear()
         drawer.drawGrid(GRID_ROW,GRID_COL,WHITE)

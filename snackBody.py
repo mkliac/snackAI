@@ -23,3 +23,4 @@ class Snack():
 
     def getPieces(self):
         return self.pieces
+
