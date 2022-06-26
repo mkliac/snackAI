@@ -83,7 +83,10 @@ def generateFood():
 def main():
     pg.init()
     SCREEN = pg.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-    
+    text_font = pg.font.SysFont("monospace", 16)
+
+    highest_score = 0
+
     gameOver = False
     score = 0
     dir = 'D'
@@ -92,7 +95,7 @@ def main():
 
     snack = Snack(BLUE,head_x,head_y)
 
-    drawer = Draw(SCREEN,BLOCK_SIZE)
+    drawer = Draw(SCREEN,BLOCK_SIZE,text_font)
 
     fps = pg.time.Clock()
 
@@ -110,7 +113,7 @@ def main():
         
         head_x,head_y = move(dir,head_x,head_y)
  
-        if(head_x == foodBlock.getX() and head_y == foodBlock.getY()):
+        if(head_x == foodBlock.getX() and head_y == foodBlock.getY()): #eat food
             foodBlock = generateFood()
             score += 1
         else:
@@ -121,14 +124,13 @@ def main():
         
         snack.append(head_x,head_y)
 
+        drawer.screenClear()
         drawer.drawGrid(GRID_ROW,GRID_COL,WHITE)
         drawer.drawFood(foodBlock)
         drawer.drawSnack(snack.getPieces())
-
+        drawer.showText("Score: {0}".format(score),WINDOW_WIDTH/2,0)
         pg.display.update()
         fps.tick(SPEED)
-    
-    print("game over")
 
 if __name__ == "__main__":
     main()
