@@ -12,14 +12,10 @@ class Draw:
                 rect = pg.Rect(x*self.block_size,y*self.block_size,self.block_size,self.block_size)
                 pg.draw.rect(self.screen,border_color,rect,1)
 
-    def drawSnack(self,snakePieces):
-        for block in snakePieces:
+    def drawBlocks(self, blocks):
+        for block in blocks:
             rect = pg.Rect(block.getX()*self.block_size,block.getY()*self.block_size,self.block_size,self.block_size)
             pg.draw.rect(self.screen,block.getColor(),rect,1)
-
-    def drawFood(self,food_block):
-        rect = pg.Rect(food_block.getX()*self.block_size,food_block.getY()*self.block_size,self.block_size,self.block_size)
-        pg.draw.rect(self.screen,food_block.getColor(),rect,1)
 
     def showText(self,message,x,y):
         text = self.text_font.render(message,1,(200,200,200))

@@ -7,7 +7,7 @@ class Snack():
         self.color = color
 
         head_block = Block(self.head_x,self.head_y,self.color)
-        self.pieces = deque([head_block])
+        self.snackBlocks = deque([head_block])
 
     # append new head pos at front
     def append(self,new_head_x,new_head_y):
@@ -15,12 +15,12 @@ class Snack():
         self.head_y = new_head_y
 
         head_block = Block(self.head_x,self.head_y,self.color)
-        self.pieces.appendleft(head_block)
+        self.snackBlocks.appendleft(head_block)
 
     # pop tail
     def pop(self):
-        self.pieces.pop()
+        self.snackBlocks.pop()
 
-    def getPieces(self):
-        return self.pieces
+    def getBlocks(self):
+        return self.snackBlocks
 

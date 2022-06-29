@@ -1,28 +1,17 @@
-from operator import ge
 from snackBody import Snack
 from draw import Draw
 from block import Block
+from food import Food
+import config as cf
 import pygame as pg
 import random
 import time
-
-BLACK = (0, 0, 0)
-WHITE = (200, 200, 200)
-RED = (255,0,0)
-BLUE = (0,0,255)
-WINDOW_HEIGHT = 400
-WINDOW_WIDTH = 800
-BLOCK_SIZE = 20
-SPEED = 15
-GRID_ROW = int(WINDOW_WIDTH/(2*BLOCK_SIZE))
-GRID_COL = int(WINDOW_HEIGHT/BLOCK_SIZE)
-WALL = False
 
 def validateMove(snackBody):
     head_x = snackBody[0].getX()
     head_y = snackBody[0].getY()
 
-    if(head_x < 0 or head_y < 0 or head_x >= GRID_COL or head_y >= GRID_ROW):
+    if(head_x < 0 or head_y < 0 or head_x >= cf.GRID_COL or head_y >= cf.GRID_ROW):
         return False
 
     i = 0
@@ -53,8 +42,8 @@ def move(dir,head_x,head_y,wall):
         ry = head_y
     
     if(wall == False):
-        rx = rx % GRID_COL
-        ry = ry % GRID_ROW
+        rx = rx % cf.GRID_COL
+        ry = ry % cf.GRID_ROW
 
     return rx, ry
 
@@ -83,37 +72,28 @@ def changeDir(dir,idir):
 
     return rdir
 
-def generateFood():
-    x = random.randint(1,GRID_COL)-1
-    y = random.randint(1,GRID_ROW)-1
-    block = Block(x,y,RED)
-
-    return block
-
-def eatFood(snackBody,foodBlock):
-    for block in snackBody:
-        if(block.getX() == foodBlock.getX() and block.getY() == foodBlock.getY()):
-            return True
+def eatFood(snackBody,foods):
+    for idx, food in enumerate(foods.getBlocks()):
+        for block in snackBody.getBlocks():
+            if(block.getX() == food.getX() and block.getY() == food.getY()):
+                foods.newFood(idx)
+                return True
 
     return False
 
 def main():
     pg.init()
-    SCREEN = pg.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+    SCREEN = pg.display.set_mode((cf.WINDOW_WIDTH, cf.WINDOW_HEIGHT))
     text_font = pg.font.SysFont("monospace", 16)
 
     highest_score = 0
-
     gameOver = False
     score = 0
     dir = 'D'
-    head_x,head_y = int(GRID_COL/2), int(GRID_ROW/2)
-    foodBlock = generateFood()
-
-    snack = Snack(BLUE,head_x,head_y)
-
-    drawer = Draw(SCREEN,BLOCK_SIZE,text_font)
-
+    head_x,head_y = int(cf.GRID_COL/2), int(cf.GRID_ROW/2)
+    foodHandler = Food(2)
+    snackHandler = Snack(cf.BLUE,head_x,head_y)
+    drawer = Draw(SCREEN,cf.BLOCK_SIZE,text_font)
     fps = pg.time.Clock()
 
     while(gameOver == False):
@@ -123,26 +103,25 @@ def main():
             if event.type == pg.KEYDOWN:
                 dir = changeDir(dir,event.key)
         
-        head_x,head_y = move(dir,head_x,head_y,WALL)
+        head_x,head_y = move(dir,head_x,head_y,cf.WALL)
 
-        snack.append(head_x,head_y)
+        snackHandler.append(head_x,head_y)
 
-        if(eatFood(snack.getPieces(),foodBlock) == True): #eat food
-            foodBlock = generateFood()
+        if(eatFood(snackHandler,foodHandler) == True): #eat food
             score += 1
         else:
-            snack.pop()
+            snackHandler.pop()
 
-        if(validateMove(snack.getPieces()) == False):
+        if(validateMove(snackHandler.getBlocks()) == False):
             gameOver = True
 
         drawer.screenClear()
-        drawer.drawGrid(GRID_ROW,GRID_COL,WHITE)
-        drawer.drawFood(foodBlock)
-        drawer.drawSnack(snack.getPieces())
-        drawer.showText("Score: {0}".format(score),WINDOW_WIDTH/2,0)
+        drawer.drawGrid(cf.GRID_ROW,cf.GRID_COL,cf.WHITE)
+        drawer.drawBlocks(foodHandler.getBlocks())
+        drawer.drawBlocks(snackHandler.getBlocks())
+        drawer.showText("Score: {0}".format(score),cf.WINDOW_WIDTH/2,0)
         pg.display.update()
-        fps.tick(SPEED)
+        fps.tick(cf.SPEED)
 
 if __name__ == "__main__":
     main()
