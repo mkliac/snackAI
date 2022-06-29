@@ -91,7 +91,7 @@ def main():
     score = 0
     dir = 'D'
     head_x,head_y = int(cf.GRID_COL/2), int(cf.GRID_ROW/2)
-    foodHandler = Food(2)
+    foodHandler = Food(cf.NUM_FOOD)
     snackHandler = Snack(cf.BLUE,head_x,head_y)
     drawer = Draw(SCREEN,cf.BLOCK_SIZE,text_font)
     fps = pg.time.Clock()
